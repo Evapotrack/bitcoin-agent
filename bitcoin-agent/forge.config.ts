@@ -11,9 +11,81 @@ import { FuseV1Options, FuseVersion } from '@electron/fuses';
 import { mainConfig } from './webpack.main.config';
 import { rendererConfig } from './webpack.renderer.config';
 
+// Native modules that webpack externalizes — must be copied to the packaged app
+const nativeExternals = [
+  'tiny-secp256k1',
+  'keytar',
+  'serialport',
+  '@serialport',
+  'cbor-x',
+  '@anthropic-ai',
+  'bip32',
+  'bitcoinjs-lib',
+  'ecpair',
+  'axios',
+  'bip39',
+];
+
 const config: ForgeConfig = {
   packagerConfig: {
-    asar: true,
+    asar: {
+      unpack: '{**/*.node,**/*.wasm}',
+    },
+    afterCopy: [
+      // Copy externalized native modules into the packaged node_modules
+      (buildPath: string, _electronVersion: string, _platform: string, _arch: string, callback: (err?: Error) => void) => {
+        const fs = require('fs');
+        const path = require('path');
+        const srcModules = path.resolve(__dirname, 'node_modules');
+        const destModules = path.join(buildPath, 'node_modules');
+
+        function copyRecursive(src: string, dest: string) {
+          if (!fs.existsSync(src)) return;
+          const stat = fs.statSync(src);
+          if (stat.isDirectory()) {
+            fs.mkdirSync(dest, { recursive: true });
+            for (const child of fs.readdirSync(src)) {
+              copyRecursive(path.join(src, child), path.join(dest, child));
+            }
+          } else {
+            fs.copyFileSync(src, dest);
+          }
+        }
+
+        fs.mkdirSync(destModules, { recursive: true });
+
+        // Copy each externalized module and its dependencies
+        for (const mod of nativeExternals) {
+          const src = path.join(srcModules, mod);
+          const dest = path.join(destModules, mod);
+          if (fs.existsSync(src)) {
+            copyRecursive(src, dest);
+          }
+        }
+
+        // Also copy transitive dependencies needed by the externals
+        const transitive = [
+          'base-x', 'bs58', 'bs58check', 'bech32', 'varuint-bitcoin',
+          'create-hash', 'create-hmac', 'cipher-base', 'inherits',
+          'hash-base', 'md5.js', 'ripemd160', 'sha.js', 'safe-buffer',
+          'randombytes', 'typeforce', 'wif', 'pushdata-bitcoin',
+          'uint8array-tools', 'valibot',
+          'follow-redirects', 'proxy-from-env', 'form-data', 'combined-stream',
+          'delayed-stream', 'mime-types', 'mime-db',
+          'node-addon-api', 'prebuild-install', 'node-gyp-build',
+        ];
+
+        for (const mod of transitive) {
+          const src = path.join(srcModules, mod);
+          const dest = path.join(destModules, mod);
+          if (fs.existsSync(src) && !fs.existsSync(dest)) {
+            copyRecursive(src, dest);
+          }
+        }
+
+        callback();
+      },
+    ],
   },
   rebuildConfig: {},
   makers: [
@@ -40,16 +112,14 @@ const config: ForgeConfig = {
         ],
       },
     }),
-    // Fuses are used to enable/disable various Electron functionality
-    // at package time, before code signing the application
     new FusesPlugin({
       version: FuseVersion.V1,
       [FuseV1Options.RunAsNode]: false,
       [FuseV1Options.EnableCookieEncryption]: true,
       [FuseV1Options.EnableNodeOptionsEnvironmentVariable]: false,
       [FuseV1Options.EnableNodeCliInspectArguments]: false,
-      [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: true,
-      [FuseV1Options.OnlyLoadAppFromAsar]: true,
+      [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: false,
+      [FuseV1Options.OnlyLoadAppFromAsar]: false,
     }),
   ],
 };
