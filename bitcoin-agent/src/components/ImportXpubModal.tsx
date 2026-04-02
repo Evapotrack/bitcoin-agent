@@ -18,16 +18,65 @@ export function ImportXpubModal() {
     xpubInput.trim().startsWith('zpub');
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-950">
-      <div className="w-full max-w-lg bg-gray-900 rounded-lg border border-gray-800 p-8">
-        <h1 className="text-2xl font-bold text-white mb-2">BTC Agent App</h1>
-        <p className="text-sm text-gray-400 mb-4">
-          Import your extended public key to create a watch-only wallet. This
-          lets the app see your balance and build unsigned transactions — your
-          private keys stay on your hardware device.
-        </p>
+    <div className="flex items-center justify-center h-screen bg-gray-950 overflow-y-auto">
+      <div className="w-full max-w-lg bg-gray-900 rounded-lg border border-gray-800 p-8 my-8">
+        <h1 className="text-2xl font-bold text-white mb-4">BTC Agent App</h1>
 
-        <div className="bg-gray-800/50 rounded-lg p-4 mb-5 space-y-2">
+        {/* What is this step */}
+        <div className="bg-gray-800/50 rounded-lg p-4 mb-4">
+          <p className="text-xs font-medium text-orange-400 mb-1">
+            What is this?
+          </p>
+          <p className="text-xs text-gray-400">
+            This app is a watch-only wallet. It needs your extended public key
+            (xpub) to see your balance and build unsigned transactions. Your
+            private keys stay on your hardware wallet — they are never stored
+            here.
+          </p>
+        </div>
+
+        {/* Do I need a wallet first? */}
+        <div className="bg-gray-800/50 rounded-lg p-4 mb-4">
+          <p className="text-xs font-medium text-orange-400 mb-1">
+            Do I need a wallet already?
+          </p>
+          <p className="text-xs text-gray-400 mb-2">
+            Yes — this app connects to an existing Bitcoin wallet. It does not
+            create a new wallet or generate seed phrases. You need a wallet set
+            up on one of these:
+          </p>
+          <div className="space-y-1 ml-2">
+            <p className="text-xs text-gray-400">
+              <span className="text-gray-300">Hardware wallet:</span> Coldcard,
+              Blockstream Jade, Trezor, or Ledger
+            </p>
+            <p className="text-xs text-gray-400">
+              <span className="text-gray-300">Software wallet:</span> Sparrow
+              Wallet (recommended), Blockstream Green, or Electrum
+            </p>
+          </div>
+          <p className="text-xs text-gray-500 mt-2">
+            If you don't have a wallet yet, download Sparrow Wallet
+            (sparrowwallet.com), create a new wallet, and export the xpub from
+            Settings &rarr; Keystore.
+          </p>
+        </div>
+
+        {/* Testing mode */}
+        <div className="bg-gray-800/50 rounded-lg p-4 mb-4">
+          <p className="text-xs font-medium text-orange-400 mb-1">
+            Just testing?
+          </p>
+          <p className="text-xs text-gray-400">
+            The app defaults to testnet (no real Bitcoin). You can generate a
+            test key at iancoleman.io/bip39 — select "BIP84" and "Bitcoin
+            Testnet", then copy the "Account Extended Public Key" (starts with
+            tpub). No real funds are involved.
+          </p>
+        </div>
+
+        {/* Where to find your xpub */}
+        <div className="bg-gray-800/50 rounded-lg p-4 mb-5">
           <p className="text-xs font-medium text-gray-300 mb-2">
             Where to find your xpub:
           </p>
@@ -41,10 +90,8 @@ export function ImportXpubModal() {
             BIP84 tpub/zpub
           </p>
           <p className="text-xs text-gray-400">
-            <span className="text-orange-400 font-mono mr-1">Testing:</span>
-            Use a testnet tpub from{' '}
-            <span className="text-gray-300">iancoleman.io/bip39</span>{' '}
-            (select BIP84 + Bitcoin Testnet)
+            <span className="text-orange-400 font-mono mr-1">Jade:</span>
+            Connect via USB &rarr; export xpub through Blockstream Green
           </p>
         </div>
 
@@ -80,7 +127,8 @@ export function ImportXpubModal() {
         </button>
 
         <p className="text-xs text-gray-600 mt-4 text-center">
-          Watch-only — no private keys are stored in this app
+          Watch-only — no private keys are stored in this app. Your xpub is
+          saved in the macOS Keychain.
         </p>
       </div>
     </div>
