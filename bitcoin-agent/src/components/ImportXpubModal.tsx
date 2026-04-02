@@ -21,10 +21,32 @@ export function ImportXpubModal() {
     <div className="flex items-center justify-center h-screen bg-gray-950">
       <div className="w-full max-w-lg bg-gray-900 rounded-lg border border-gray-800 p-8">
         <h1 className="text-2xl font-bold text-white mb-2">BTC Agent App</h1>
-        <p className="text-sm text-gray-400 mb-6">
-          Import your extended public key to create a watch-only wallet. Your
-          xpub will be stored securely in the macOS Keychain.
+        <p className="text-sm text-gray-400 mb-4">
+          Import your extended public key to create a watch-only wallet. This
+          lets the app see your balance and build unsigned transactions — your
+          private keys stay on your hardware device.
         </p>
+
+        <div className="bg-gray-800/50 rounded-lg p-4 mb-5 space-y-2">
+          <p className="text-xs font-medium text-gray-300 mb-2">
+            Where to find your xpub:
+          </p>
+          <p className="text-xs text-gray-400">
+            <span className="text-orange-400 font-mono mr-1">Sparrow:</span>
+            Settings &rarr; Keystore &rarr; xpub (use BIP84 / Native Segwit)
+          </p>
+          <p className="text-xs text-gray-400">
+            <span className="text-orange-400 font-mono mr-1">Coldcard:</span>
+            Advanced &rarr; Export Wallet &rarr; Generic JSON &rarr; copy the
+            BIP84 tpub/zpub
+          </p>
+          <p className="text-xs text-gray-400">
+            <span className="text-orange-400 font-mono mr-1">Testing:</span>
+            Use a testnet tpub from{' '}
+            <span className="text-gray-300">iancoleman.io/bip39</span>{' '}
+            (select BIP84 + Bitcoin Testnet)
+          </p>
+        </div>
 
         <label className="block text-sm text-gray-300 mb-2">
           Extended Public Key (tpub for testnet)
