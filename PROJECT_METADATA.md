@@ -23,6 +23,11 @@
 - Andrew Brown will be credited as the sole creator of Bitcoin Agent in all documentation, the README, and the GitHub repository
 - The connection to Evapotrack is noted here for internal reference only and should not be referenced in any public-facing documentation, README, or GitHub content unless Andrew explicitly requests it
 
+**IMPORTANT — Project Separation:**
+- Bitcoin Agent and Evapotrack are entirely separate, independent projects. They share no code, no dependencies, no documentation, and no repository history.
+- Never conflate, cross-reference, or associate these two projects in any commit message, README, issue, PR, or public-facing content.
+- AI coding assistants (Claude Code or otherwise) working on this project must not import context, patterns, or references from the Evapotrack project into this one, and vice versa.
+
 ---
 
 ## Development Environment
