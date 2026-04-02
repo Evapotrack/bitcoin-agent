@@ -19,7 +19,19 @@ export function App() {
   const [needsApiKey, setNeedsApiKey] = useState<boolean | null>(null);
 
   useEffect(() => {
-    window.bitcoinAgent.hasPassword().then(setHasExistingPassword);
+    // Timeout fallback if keychain check hangs
+    const timeout = setTimeout(() => {
+      if (hasExistingPassword === null) {
+        setHasExistingPassword(false); // Assume first-time user
+      }
+    }, 5000);
+
+    window.bitcoinAgent
+      .hasPassword()
+      .then(setHasExistingPassword)
+      .catch(() => setHasExistingPassword(false));
+
+    return () => clearTimeout(timeout);
   }, []);
 
   const handleUnlock = () => {

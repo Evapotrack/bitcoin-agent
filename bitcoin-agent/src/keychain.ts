@@ -1,49 +1,88 @@
-import * as keytar from 'keytar';
+import { safeStorage, app } from 'electron';
+import * as fs from 'fs';
+import * as path from 'path';
 
-const SERVICE = 'bitcoin-agent';
-const ACCOUNT_XPUB = 'xpub';
-const ACCOUNT_PASSWORD = 'app-password';
+// Store encrypted secrets in app's userData directory
+// safeStorage uses the OS keychain for the encryption key (no external native modules)
+const STORE_FILE = path.join(app.getPath('userData'), 'secure-store.enc');
 
+interface SecureStore {
+  password?: string;
+  recoveryKey?: string;
+  xpub?: string;
+  apiKey?: string;
+}
+
+function loadStore(): SecureStore {
+  try {
+    if (!fs.existsSync(STORE_FILE)) return {};
+    const encrypted = fs.readFileSync(STORE_FILE);
+    if (!safeStorage.isEncryptionAvailable()) return {};
+    const decrypted = safeStorage.decryptString(encrypted);
+    return JSON.parse(decrypted);
+  } catch {
+    return {};
+  }
+}
+
+function saveStore(store: SecureStore): void {
+  try {
+    if (!safeStorage.isEncryptionAvailable()) return;
+    const json = JSON.stringify(store);
+    const encrypted = safeStorage.encryptString(json);
+    const dir = path.dirname(STORE_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(STORE_FILE, encrypted);
+  } catch (err) {
+    console.error('Failed to save secure store:', err);
+  }
+}
+
+// --- xpub ---
 export async function storeXpub(xpub: string): Promise<void> {
-  await keytar.setPassword(SERVICE, ACCOUNT_XPUB, xpub);
+  const store = loadStore();
+  store.xpub = xpub;
+  saveStore(store);
 }
 
 export async function getXpub(): Promise<string | null> {
-  return keytar.getPassword(SERVICE, ACCOUNT_XPUB);
+  return loadStore().xpub || null;
 }
 
 export async function deleteXpub(): Promise<boolean> {
-  return keytar.deletePassword(SERVICE, ACCOUNT_XPUB);
+  const store = loadStore();
+  delete store.xpub;
+  saveStore(store);
+  return true;
 }
 
-// Password management
+// --- Password ---
 export async function hasPassword(): Promise<boolean> {
-  const pw = await keytar.getPassword(SERVICE, ACCOUNT_PASSWORD);
-  return pw !== null;
+  return !!loadStore().password;
 }
 
 export async function verifyPassword(password: string): Promise<boolean> {
-  const stored = await keytar.getPassword(SERVICE, ACCOUNT_PASSWORD);
-  return stored === password;
+  return loadStore().password === password;
 }
 
 export async function setPassword(password: string): Promise<void> {
-  await keytar.setPassword(SERVICE, ACCOUNT_PASSWORD, password);
+  const store = loadStore();
+  store.password = password;
+  saveStore(store);
 }
 
 export async function changePassword(
   currentPassword: string,
   newPassword: string
 ): Promise<boolean> {
-  const valid = await verifyPassword(currentPassword);
-  if (!valid) return false;
-  await keytar.setPassword(SERVICE, ACCOUNT_PASSWORD, newPassword);
+  const store = loadStore();
+  if (store.password !== currentPassword) return false;
+  store.password = newPassword;
+  saveStore(store);
   return true;
 }
 
-// Recovery key management
-const ACCOUNT_RECOVERY = 'recovery-key';
-
+// --- Recovery key ---
 function generateRecoveryKey(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const segments: string[] = [];
@@ -59,41 +98,42 @@ function generateRecoveryKey(): string {
 
 export async function createRecoveryKey(): Promise<string> {
   const key = generateRecoveryKey();
-  await keytar.setPassword(SERVICE, ACCOUNT_RECOVERY, key);
+  const store = loadStore();
+  store.recoveryKey = key;
+  saveStore(store);
   return key;
 }
 
 export async function getRecoveryKey(): Promise<string | null> {
-  return keytar.getPassword(SERVICE, ACCOUNT_RECOVERY);
+  return loadStore().recoveryKey || null;
 }
 
 export async function verifyRecoveryKey(key: string): Promise<boolean> {
-  const stored = await keytar.getPassword(SERVICE, ACCOUNT_RECOVERY);
-  return stored === key;
+  return loadStore().recoveryKey === key;
 }
 
 export async function resetPasswordWithRecovery(
   recoveryKey: string,
   newPassword: string
 ): Promise<boolean> {
-  const valid = await verifyRecoveryKey(recoveryKey);
-  if (!valid) return false;
-  await keytar.setPassword(SERVICE, ACCOUNT_PASSWORD, newPassword);
+  const store = loadStore();
+  if (store.recoveryKey !== recoveryKey) return false;
+  store.password = newPassword;
+  saveStore(store);
   return true;
 }
 
-// API key management
-const ACCOUNT_API_KEY = 'anthropic-api-key';
-
+// --- API key ---
 export async function hasApiKey(): Promise<boolean> {
-  const key = await keytar.getPassword(SERVICE, ACCOUNT_API_KEY);
-  return key !== null;
+  return !!loadStore().apiKey;
 }
 
 export async function getApiKey(): Promise<string | null> {
-  return keytar.getPassword(SERVICE, ACCOUNT_API_KEY);
+  return loadStore().apiKey || null;
 }
 
 export async function storeApiKey(key: string): Promise<void> {
-  await keytar.setPassword(SERVICE, ACCOUNT_API_KEY, key);
+  const store = loadStore();
+  store.apiKey = key;
+  saveStore(store);
 }
