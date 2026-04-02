@@ -100,15 +100,7 @@ export const TOOL_DEFINITIONS: Tool[] = [
 // In-memory address index counter
 let nextAddressIndex = 0;
 
-// In-memory PSBT history (shared with store via IPC in future)
-let psbtHistory: Array<{
-  destination: string;
-  amountSats: number;
-  fee: number;
-  status: string;
-  txid?: string;
-  createdAt: number;
-}> = [];
+// PSBT history tracked via IPC — agent reports results, renderer store is source of truth
 
 export async function executeTool(
   toolName: string,
@@ -203,14 +195,6 @@ export async function executeTool(
         networkType: context.networkType,
       });
 
-      psbtHistory.unshift({
-        destination,
-        amountSats,
-        fee: result.fee,
-        status: 'built',
-        createdAt: Date.now(),
-      });
-
       return JSON.stringify({
         status: 'PSBT built successfully',
         destination,
@@ -224,22 +208,10 @@ export async function executeTool(
     }
 
     case 'get_transactions': {
-      if (psbtHistory.length === 0) {
-        return JSON.stringify({
-          transactions: [],
-          message: 'No transactions yet.',
-        });
-      }
+      // Transaction history is managed by the renderer store
+      // Return a note directing the agent to inform the user
       return JSON.stringify({
-        count: psbtHistory.length,
-        transactions: psbtHistory.slice(0, 10).map((tx) => ({
-          destination: tx.destination.slice(0, 12) + '...',
-          amount: `${tx.amountSats} sats`,
-          fee: `${tx.fee} sats`,
-          status: tx.status,
-          txid: tx.txid || 'not broadcast',
-          date: new Date(tx.createdAt).toISOString(),
-        })),
+        message: 'Transaction history is available in the Transactions tab. Use the sidebar to view past PSBTs and their status.',
       });
     }
 

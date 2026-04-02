@@ -12,8 +12,8 @@ export function ApiKeySetup({ onComplete }: ApiKeySetupProps) {
   const handleSave = async () => {
     const trimmed = apiKey.trim();
     if (!trimmed) return;
-    if (!trimmed.startsWith('sk-ant-')) {
-      setError('API key should start with sk-ant-');
+    if (!trimmed.startsWith('sk-ant-') || trimmed.length < 30) {
+      setError('Invalid API key. It should start with sk-ant- and be at least 30 characters.');
       return;
     }
     setIsLoading(true);

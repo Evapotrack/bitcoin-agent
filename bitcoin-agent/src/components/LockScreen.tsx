@@ -25,8 +25,8 @@ export function LockScreen({ hasExistingPassword, onUnlock }: LockScreenProps) {
   };
 
   const handleSetup = async () => {
-    if (!password || password.length < 4) {
-      setError('Password must be at least 4 characters');
+    if (!password || password.length < 8) {
+      setError('Password must be at least 8 characters');
       return;
     }
     if (password !== confirmPassword) {
