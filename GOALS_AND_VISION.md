@@ -299,6 +299,8 @@ Task platforms scanned: Stacker News, Bitbounty.dev, Nostr bounties (NIP-99), LN
 | Apr 1, 2026 | Packaged as macOS .app (double-click launch) | Done |
 | Apr 1, 2026 | API key purchased and stored in Keychain | Done |
 | Apr 1, 2026 | M5: Blockstream Jade USB signing integration | Done |
+| Apr 1, 2026 | Replaced keytar with Electron safeStorage (fixes packaged app) | Done |
+| Apr 1, 2026 | .app packaging debugging (ASAR native module resolution) | Done |
 | — | M6: Lightning node (LDK) + NWC + auto-sweep | Not started |
 | — | M7: L402 server + Nostr zaps | Not started |
 | — | M8: Autonomous task discovery + execution | Not started |
