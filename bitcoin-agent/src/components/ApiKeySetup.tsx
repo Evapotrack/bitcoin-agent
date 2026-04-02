@@ -33,28 +33,73 @@ export function ApiKeySetup({ onComplete, onSkip }: ApiKeySetupProps) {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-950">
-      <div className="w-full max-w-lg bg-gray-900 rounded-lg border border-gray-800 p-8">
-        <h1 className="text-2xl font-bold text-white mb-2">BTC Agent App</h1>
-        <p className="text-sm text-gray-400 mb-6">
-          Enter your Anthropic API key to enable the AI agent. The key is stored
-          securely in the macOS Keychain — never on disk or in environment
-          variables.
-        </p>
+    <div className="flex items-center justify-center h-screen bg-gray-950 overflow-y-auto">
+      <div className="w-full max-w-lg bg-gray-900 rounded-lg border border-gray-800 p-8 my-8">
+        <h1 className="text-2xl font-bold text-white mb-4">BTC Agent App</h1>
+
+        <div className="space-y-4 mb-6">
+          <div className="bg-gray-800/50 rounded-lg p-4">
+            <p className="text-xs font-medium text-orange-400 mb-1">
+              What is this?
+            </p>
+            <p className="text-xs text-gray-400">
+              BTC Agent App includes an AI assistant powered by Claude that can
+              check your balance, estimate fees, build transactions, and answer
+              questions about your wallet — all through natural language chat.
+            </p>
+          </div>
+
+          <div className="bg-gray-800/50 rounded-lg p-4">
+            <p className="text-xs font-medium text-orange-400 mb-1">
+              Why do I need an API key?
+            </p>
+            <p className="text-xs text-gray-400">
+              The AI agent runs on Anthropic's Claude API. An API key connects
+              your app to Claude so it can process your requests. Without it,
+              the agent chat won't work — but everything else in the app still
+              does.
+            </p>
+          </div>
+
+          <div className="bg-gray-800/50 rounded-lg p-4">
+            <p className="text-xs font-medium text-orange-400 mb-1">
+              How much does it cost?
+            </p>
+            <p className="text-xs text-gray-400">
+              API credits are prepaid (not a subscription). $20 gets you started,
+              $50 lasts months of personal use. A typical chat costs less than
+              $0.01. Credits expire after 1 year.
+            </p>
+          </div>
+
+          <div className="bg-gray-800/50 rounded-lg p-4">
+            <p className="text-xs font-medium text-orange-400 mb-1">
+              Is it secure?
+            </p>
+            <p className="text-xs text-gray-400">
+              Your API key is stored in the macOS Keychain — the same system
+              that stores your passwords and certificates. It is never written
+              to disk, never in environment variables, and never leaves your
+              machine.
+            </p>
+          </div>
+        </div>
 
         <div className="bg-gray-800/50 rounded-lg p-4 mb-5 space-y-2">
+          <p className="text-xs font-medium text-gray-300 mb-2">
+            How to get your key:
+          </p>
           <p className="text-xs text-gray-400">
             <span className="text-orange-400 font-mono mr-1">1.</span>
-            Go to{' '}
-            <span className="text-gray-300">console.anthropic.com/settings/keys</span>
+            Go to console.anthropic.com/settings/keys
           </p>
           <p className="text-xs text-gray-400">
             <span className="text-orange-400 font-mono mr-1">2.</span>
-            Create a new API key
+            Buy credits ($20–$100) if you haven't already
           </p>
           <p className="text-xs text-gray-400">
             <span className="text-orange-400 font-mono mr-1">3.</span>
-            Paste it below (starts with sk-ant-)
+            Create a new API key and paste it below
           </p>
         </div>
 
@@ -92,7 +137,9 @@ export function ApiKeySetup({ onComplete, onSkip }: ApiKeySetupProps) {
         </button>
 
         <p className="text-xs text-gray-600 mt-3 text-center">
-          The Agent chat tab requires an API key. All other features work without it.
+          Without an API key, Dashboard, Send, Transactions, Reference, and How
+          To all work normally. Only the Agent chat requires it. You can add
+          your key later in Settings.
         </p>
       </div>
     </div>

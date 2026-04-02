@@ -31,6 +31,7 @@ export interface BuildPsbtResult {
   destination: string;
   amountSats: number;
   requiresConfirmation: boolean;
+  selectedUtxos: { txid: string; vout: number; value: number }[];
 }
 
 function estimateVsize(inputCount: number, outputCount: number): number {
@@ -146,6 +147,11 @@ export async function buildPsbt(
     outputCount,
     changeAmount,
     changeAddress,
+    selectedUtxos: selected.map((u) => ({
+      txid: u.txid,
+      vout: u.vout,
+      value: u.value,
+    })),
     destination,
     amountSats,
     requiresConfirmation: amountSats > 1_000_000,

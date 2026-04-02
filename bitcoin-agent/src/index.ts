@@ -26,6 +26,7 @@ import {
   storeApiKey,
 } from './keychain';
 import { sendAgentMessage } from './agent/agent';
+import { getUtxoLabels } from './agent/tools';
 import type { MessageParam } from '@anthropic-ai/sdk/resources/messages';
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
@@ -230,6 +231,21 @@ ipcMain.handle('agent:sendMessage', async (_event, message: string) => {
   agentChatHistory.push({ role: 'assistant', content: response.message });
 
   return response;
+});
+
+// --- UTXO Label IPC Handlers ---
+
+ipcMain.handle(
+  'wallet:labelUtxo',
+  async (_event, txid: string, vout: number, label: string) => {
+    const { getUtxoLabels: getLabels } = await import('./agent/tools');
+    const labels = getLabels();
+    labels[`${txid}:${vout}`] = label;
+  }
+);
+
+ipcMain.handle('wallet:getUtxoLabels', async () => {
+  return getUtxoLabels();
 });
 
 // --- Password IPC Handlers ---

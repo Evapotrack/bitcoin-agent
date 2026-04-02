@@ -16,6 +16,11 @@ contextBridge.exposeInMainWorld('bitcoinAgent', {
   sendAgentMessage: (message: string) =>
     ipcRenderer.invoke('agent:sendMessage', message),
 
+  // UTXO Labels
+  labelUtxo: (txid: string, vout: number, label: string) =>
+    ipcRenderer.invoke('wallet:labelUtxo', txid, vout, label),
+  getUtxoLabels: () => ipcRenderer.invoke('wallet:getUtxoLabels'),
+
   // M1 — Wallet
   importXpub: (xpub: string) =>
     ipcRenderer.invoke('wallet:importXpub', xpub),

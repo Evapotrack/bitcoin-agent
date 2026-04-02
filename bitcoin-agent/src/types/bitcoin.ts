@@ -10,6 +10,7 @@ export interface UTXODisplay {
   status: UTXOStatus;
   address: string;
   addressIndex: number;
+  label?: string;
 }
 
 export interface FeeEstimates {
@@ -18,6 +19,12 @@ export interface FeeEstimates {
   hourFee: number;
   economyFee: number;
   minimumFee: number;
+}
+
+export interface SelectedUtxoInfo {
+  txid: string;
+  vout: number;
+  value: number;
 }
 
 export interface BuildPsbtResult {
@@ -31,6 +38,7 @@ export interface BuildPsbtResult {
   destination: string;
   amountSats: number;
   requiresConfirmation: boolean;
+  selectedUtxos: SelectedUtxoInfo[];
 }
 
 export type PsbtStatus = 'built' | 'signed' | 'broadcast' | 'confirming' | 'confirmed';
@@ -53,7 +61,22 @@ export interface ChatMessage {
   toolResults?: { tool: string; result: string }[];
 }
 
+export interface TokenUsage {
+  inputTokens: number;
+  outputTokens: number;
+}
+
+export interface UsageRecord {
+  timestamp: number;
+  inputTokens: number;
+  outputTokens: number;
+  estimatedCost: number;
+}
+
 export interface AgentResponse {
   message: string;
   toolResults: { tool: string; input: Record<string, unknown>; result: string }[];
+  usage?: TokenUsage;
 }
+
+// Add label to UTXO display

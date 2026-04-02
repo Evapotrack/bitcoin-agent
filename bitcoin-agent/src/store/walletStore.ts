@@ -6,9 +6,14 @@ import type {
   PsbtRecord,
   PsbtStatus,
   ChatMessage,
+  UsageRecord,
 } from '../types/bitcoin';
 
-type View = 'dashboard' | 'send' | 'transactions' | 'chat' | 'reference' | 'howto';
+type View = 'dashboard' | 'send' | 'transactions' | 'chat' | 'reference' | 'howto' | 'settings';
+
+// Claude Sonnet 4.6 pricing
+const INPUT_COST_PER_TOKEN = 3 / 1_000_000;
+const OUTPUT_COST_PER_TOKEN = 15 / 1_000_000;
 
 interface WalletState {
   // M1
@@ -31,6 +36,12 @@ interface WalletState {
   chatHistory: ChatMessage[];
   isAgentThinking: boolean;
 
+  // M4
+  usageHistory: UsageRecord[];
+  totalInputTokens: number;
+  totalOutputTokens: number;
+  utxoLabels: Record<string, string>;
+
   // M1 Actions
   importXpub: (xpub: string) => Promise<void>;
   loadExistingWallet: () => Promise<void>;
@@ -41,6 +52,10 @@ interface WalletState {
   // M3 Actions
   sendAgentMessage: (message: string) => Promise<void>;
   clearChat: () => void;
+
+  // M4 Actions
+  labelUtxo: (txid: string, vout: number, label: string) => Promise<void>;
+  loadUtxoLabels: () => Promise<void>;
 
   // M2 Actions
   fetchUtxos: () => Promise<void>;
@@ -78,6 +93,12 @@ export const useWalletStore = create<WalletState>((set, get) => ({
   // M3 State
   chatHistory: [],
   isAgentThinking: false,
+
+  // M4 State
+  usageHistory: [],
+  totalInputTokens: 0,
+  totalOutputTokens: 0,
+  utxoLabels: {},
 
   // M1 Actions
   importXpub: async (xpub: string) => {
@@ -154,10 +175,28 @@ export const useWalletStore = create<WalletState>((set, get) => ({
           result: tr.result,
         })),
       };
-      set((state) => ({
-        chatHistory: [...state.chatHistory, assistantMsg],
+      // Track token usage
+      const usageUpdate: Partial<ReturnType<typeof get>> = {
+        chatHistory: [...get().chatHistory, assistantMsg],
         isAgentThinking: false,
-      }));
+      };
+      if (response.usage) {
+        const cost =
+          response.usage.inputTokens * INPUT_COST_PER_TOKEN +
+          response.usage.outputTokens * OUTPUT_COST_PER_TOKEN;
+        const record: UsageRecord = {
+          timestamp: Date.now(),
+          inputTokens: response.usage.inputTokens,
+          outputTokens: response.usage.outputTokens,
+          estimatedCost: cost,
+        };
+        usageUpdate.usageHistory = [...get().usageHistory, record];
+        usageUpdate.totalInputTokens =
+          get().totalInputTokens + response.usage.inputTokens;
+        usageUpdate.totalOutputTokens =
+          get().totalOutputTokens + response.usage.outputTokens;
+      }
+      set(usageUpdate as never);
     } catch (err) {
       const errorMsg: ChatMessage = {
         role: 'assistant',
@@ -172,6 +211,23 @@ export const useWalletStore = create<WalletState>((set, get) => ({
   },
 
   clearChat: () => set({ chatHistory: [] }),
+
+  // M4 Actions
+  labelUtxo: async (txid: string, vout: number, label: string) => {
+    await window.bitcoinAgent.labelUtxo(txid, vout, label);
+    set((state) => ({
+      utxoLabels: { ...state.utxoLabels, [`${txid}:${vout}`]: label },
+    }));
+  },
+
+  loadUtxoLabels: async () => {
+    try {
+      const labels = await window.bitcoinAgent.getUtxoLabels();
+      set({ utxoLabels: labels });
+    } catch {
+      // Labels not critical — fail silently
+    }
+  },
 
   // M2 Actions
   fetchUtxos: async () => {

@@ -332,6 +332,30 @@ export function SendView() {
           )}
         </div>
 
+        {/* Selected UTXOs (Coin Control Visibility) */}
+        {currentPsbt.selectedUtxos && currentPsbt.selectedUtxos.length > 0 && (
+          <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 mb-4">
+            <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">
+              Selected Inputs
+            </p>
+            <div className="space-y-1">
+              {currentPsbt.selectedUtxos.map((u, i) => (
+                <div
+                  key={i}
+                  className="flex justify-between text-xs text-gray-400 bg-gray-800/50 rounded px-2 py-1"
+                >
+                  <span className="font-mono">
+                    {u.txid.slice(0, 8)}...:{u.vout}
+                  </span>
+                  <span className="font-mono">
+                    {formatSats(u.value)} sats
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {!psbtTooLarge && (
           <div className="flex justify-center mb-4">
             <div className="bg-white p-3 rounded">

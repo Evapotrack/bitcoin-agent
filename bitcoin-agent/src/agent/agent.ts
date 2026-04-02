@@ -19,6 +19,7 @@ export interface ToolCallResult {
 export interface AgentResponse {
   message: string;
   toolResults: ToolCallResult[];
+  usage?: { inputTokens: number; outputTokens: number };
 }
 
 export async function sendAgentMessage(
@@ -29,7 +30,6 @@ export async function sendAgentMessage(
 ): Promise<AgentResponse> {
   const client = new Anthropic({ apiKey });
 
-  // Build messages array with history + new user message
   const messages: MessageParam[] = [
     ...chatHistory,
     { role: 'user', content: userMessage },
@@ -38,10 +38,13 @@ export async function sendAgentMessage(
   const toolResults: ToolCallResult[] = [];
   let finalMessage = '';
 
-  // Agentic loop: keep calling Claude until we get a final text response
+  // Track cumulative token usage across all API calls in this conversation turn
+  let totalInputTokens = 0;
+  let totalOutputTokens = 0;
+
   let currentMessages = messages;
   let iterations = 0;
-  const maxIterations = 5; // Safety limit
+  const maxIterations = 5;
 
   while (iterations < maxIterations) {
     iterations++;
@@ -54,11 +57,15 @@ export async function sendAgentMessage(
       messages: currentMessages,
     });
 
-    // Collect text blocks
+    // Capture token usage from this API call
+    if (response.usage) {
+      totalInputTokens += response.usage.input_tokens;
+      totalOutputTokens += response.usage.output_tokens;
+    }
+
     const textBlocks = response.content.filter((b) => b.type === 'text');
     const toolUseBlocks = response.content.filter((b) => b.type === 'tool_use');
 
-    // If no tool calls, we're done
     if (toolUseBlocks.length === 0) {
       finalMessage = textBlocks.map((b) => {
         if (b.type === 'text') return b.text;
@@ -67,7 +74,7 @@ export async function sendAgentMessage(
       break;
     }
 
-    // Execute tool calls one at a time (enforce one-task-at-a-time)
+    // Execute one tool at a time
     const toolBlock = toolUseBlocks[0];
     if (toolBlock.type !== 'tool_use') break;
 
@@ -90,15 +97,12 @@ export async function sendAgentMessage(
       result: toolResult,
     });
 
-    // Build the tool result message for the next turn
     const toolResultContent: ToolResultBlockParam[] = [{
       type: 'tool_result',
       tool_use_id: toolBlock.id,
       content: toolResult,
     }];
 
-    // If there were additional tool_use blocks we skipped, return their results as
-    // "not executed" to avoid the API expecting results for them
     for (let i = 1; i < toolUseBlocks.length; i++) {
       const skipped = toolUseBlocks[i];
       if (skipped.type === 'tool_use') {
@@ -107,20 +111,18 @@ export async function sendAgentMessage(
           tool_use_id: skipped.id,
           content: JSON.stringify({
             skipped: true,
-            message: 'This task was not executed. The agent confirms one task at a time. Please suggest this task next if still needed.',
+            message: 'This task was not executed. The agent confirms one task at a time.',
           }),
         });
       }
     }
 
-    // Add assistant response + tool results to continue the loop
     currentMessages = [
       ...currentMessages,
       { role: 'assistant', content: response.content },
       { role: 'user', content: toolResultContent as ContentBlockParam[] },
     ];
 
-    // Collect any text from this iteration
     if (textBlocks.length > 0) {
       const text = textBlocks.map((b) => {
         if (b.type === 'text') return b.text;
@@ -135,5 +137,9 @@ export async function sendAgentMessage(
   return {
     message: finalMessage || 'I completed the requested action.',
     toolResults,
+    usage: {
+      inputTokens: totalInputTokens,
+      outputTokens: totalOutputTokens,
+    },
   };
 }

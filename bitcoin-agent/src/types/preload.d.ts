@@ -3,6 +3,7 @@ import type {
   FeeEstimates,
   BuildPsbtResult,
   AgentResponse,
+  UsageRecord,
 } from './bitcoin';
 
 interface BitcoinAgentAPI {
@@ -19,6 +20,10 @@ interface BitcoinAgentAPI {
   hasApiKey: () => Promise<boolean>;
   setApiKey: (key: string) => Promise<{ success: boolean }>;
   sendAgentMessage: (message: string) => Promise<AgentResponse>;
+
+  // UTXO Labels
+  labelUtxo: (txid: string, vout: number, label: string) => Promise<void>;
+  getUtxoLabels: () => Promise<Record<string, string>>;
 
   // M1 — Wallet
   importXpub: (xpub: string) => Promise<{ success: boolean; error?: string }>;

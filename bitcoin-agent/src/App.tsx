@@ -10,6 +10,7 @@ import { HowToView } from './components/HowToView';
 import { SendView } from './components/SendView';
 import { TransactionsView } from './components/TransactionsView';
 import { ChatView } from './components/ChatView';
+import { SettingsView } from './components/SettingsView';
 
 export function App() {
   const { xpub, currentView, loadExistingWallet } = useWalletStore();
@@ -83,6 +84,8 @@ export function App() {
         return <ReferenceView />;
       case 'howto':
         return <HowToView />;
+      case 'settings':
+        return <SettingsView />;
       case 'dashboard':
       default:
         return <Dashboard />;

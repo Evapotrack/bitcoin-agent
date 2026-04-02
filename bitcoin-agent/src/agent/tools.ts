@@ -95,7 +95,38 @@ export const TOOL_DEFINITIONS: Tool[] = [
       required: [],
     },
   },
+  {
+    name: 'label_utxo',
+    description:
+      'Assign a human-readable label to a specific UTXO. Labels help track the source or purpose of funds (e.g., "Strike withdrawal", "DCA purchase", "bounty payment"). Labels are stored locally.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        txid: {
+          type: 'string',
+          description: 'The transaction ID of the UTXO',
+        },
+        vout: {
+          type: 'number',
+          description: 'The output index of the UTXO',
+        },
+        label: {
+          type: 'string',
+          description:
+            'The label to assign (e.g., "Strike withdrawal", "earned", "DCA buy")',
+        },
+      },
+      required: ['txid', 'vout', 'label'],
+    },
+  },
 ];
+
+// In-memory UTXO labels (key = "txid:vout")
+const utxoLabels: Record<string, string> = {};
+
+export function getUtxoLabels(): Record<string, string> {
+  return { ...utxoLabels };
+}
 
 // Address index counter — resets when agent context is created
 let nextAddressIndex = 0;
@@ -206,6 +237,25 @@ export async function executeTool(
         inputs: result.inputCount,
         note: 'Export this PSBT and sign it on your hardware wallet. Use the Send view to export the file.',
         psbt_base64_length: result.psbtBase64.length,
+      });
+    }
+
+    case 'label_utxo': {
+      const txid = input.txid as string;
+      const vout = input.vout as number;
+      const label = input.label as string;
+      if (!txid || vout === undefined || !label) {
+        return JSON.stringify({
+          error: 'Missing required fields: txid, vout, label',
+        });
+      }
+      const key = `${txid}:${vout}`;
+      utxoLabels[key] = label;
+      return JSON.stringify({
+        status: 'Label applied',
+        txid: txid.slice(0, 8) + '...',
+        vout,
+        label,
       });
     }
 

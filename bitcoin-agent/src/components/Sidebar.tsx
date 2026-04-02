@@ -13,6 +13,7 @@ export function Sidebar() {
     { id: 'transactions' as const, label: 'Transactions', icon: '>' },
     { id: 'reference' as const, label: 'Reference', icon: '?' },
     { id: 'howto' as const, label: 'How To', icon: 'i' },
+    { id: 'settings' as const, label: 'Settings', icon: '*' },
   ];
 
   return (
