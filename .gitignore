@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+out/
+.webpack/
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+
+# SQLite databases
+*.sqlite
+*.sqlite3
+
+# User data
+userData/
+
+# macOS
+.DS_Store
+*.swp
+
+# IDE
+.vscode/
+.idea/
+
+# Electron
+*.dmg
+*.app
+
+# TypeScript
+*.tsbuildinfo
+
+# Playwright
+/test-results/
+/playwright-report/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
