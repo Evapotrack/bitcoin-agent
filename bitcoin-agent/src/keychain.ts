@@ -4,7 +4,10 @@ import * as path from 'path';
 
 // Store encrypted secrets in app's userData directory
 // safeStorage uses the OS keychain for the encryption key (no external native modules)
-const STORE_FILE = path.join(app.getPath('userData'), 'secure-store.enc');
+// Lazy path resolution — app.getPath() requires app to be ready
+function getStorePath(): string {
+  return path.join(app.getPath('userData'), 'secure-store.enc');
+}
 
 interface SecureStore {
   password?: string;
@@ -15,8 +18,8 @@ interface SecureStore {
 
 function loadStore(): SecureStore {
   try {
-    if (!fs.existsSync(STORE_FILE)) return {};
-    const encrypted = fs.readFileSync(STORE_FILE);
+    if (!fs.existsSync(getStorePath())) return {};
+    const encrypted = fs.readFileSync(getStorePath());
     if (!safeStorage.isEncryptionAvailable()) return {};
     const decrypted = safeStorage.decryptString(encrypted);
     return JSON.parse(decrypted);
@@ -30,9 +33,9 @@ function saveStore(store: SecureStore): void {
     if (!safeStorage.isEncryptionAvailable()) return;
     const json = JSON.stringify(store);
     const encrypted = safeStorage.encryptString(json);
-    const dir = path.dirname(STORE_FILE);
+    const dir = path.dirname(getStorePath());
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(STORE_FILE, encrypted);
+    fs.writeFileSync(getStorePath(), encrypted);
   } catch (err) {
     console.error('Failed to save secure store:', err);
   }
