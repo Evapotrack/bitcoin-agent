@@ -12,6 +12,7 @@ export function Dashboard() {
     error,
     network,
     refreshBalance,
+    setView,
   } = useWalletStore();
 
   return (
@@ -47,13 +48,22 @@ export function Dashboard() {
         </div>
       )}
 
-      <button
-        onClick={refreshBalance}
-        disabled={isLoading}
-        className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {isLoading ? 'Refreshing...' : 'Refresh Balance'}
-      </button>
+      <div className="flex gap-3">
+        <button
+          onClick={() => setView('send')}
+          disabled={balanceConfirmed === 0}
+          className="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Send Bitcoin
+        </button>
+        <button
+          onClick={refreshBalance}
+          disabled={isLoading}
+          className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isLoading ? 'Refreshing...' : 'Refresh Balance'}
+        </button>
+      </div>
     </div>
   );
 }

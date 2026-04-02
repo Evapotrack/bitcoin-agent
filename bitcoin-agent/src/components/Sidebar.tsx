@@ -9,6 +9,7 @@ export function Sidebar() {
 
   const navItems = [
     { id: 'dashboard' as const, label: 'Dashboard', icon: '~' },
+    { id: 'transactions' as const, label: 'Transactions', icon: '>' },
     { id: 'reference' as const, label: 'Reference', icon: '?' },
     { id: 'howto' as const, label: 'How To', icon: 'i' },
   ];
@@ -16,7 +17,7 @@ export function Sidebar() {
   return (
     <aside className="w-60 bg-gray-900 border-r border-gray-800 flex flex-col">
       <div className="p-5 border-b border-gray-800">
-        <h1 className="text-lg font-bold text-white">Bitcoin Agent</h1>
+        <h1 className="text-lg font-bold text-white">BTC Agent App</h1>
         <span className="inline-block mt-1 px-2 py-0.5 text-xs font-mono rounded bg-yellow-600/20 text-yellow-400 uppercase tracking-wide">
           {network}
         </span>

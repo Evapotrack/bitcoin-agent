@@ -20,7 +20,7 @@ export function ImportXpubModal() {
   return (
     <div className="flex items-center justify-center h-screen bg-gray-950">
       <div className="w-full max-w-lg bg-gray-900 rounded-lg border border-gray-800 p-8">
-        <h1 className="text-2xl font-bold text-white mb-2">Bitcoin Agent</h1>
+        <h1 className="text-2xl font-bold text-white mb-2">BTC Agent App</h1>
         <p className="text-sm text-gray-400 mb-6">
           Import your extended public key to create a watch-only wallet. Your
           xpub will be stored securely in the macOS Keychain.

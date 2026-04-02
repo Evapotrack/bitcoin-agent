@@ -2,15 +2,9 @@ import * as ecc from 'tiny-secp256k1';
 import { BIP32Factory } from 'bip32';
 import * as bitcoin from 'bitcoinjs-lib';
 import axios from 'axios';
+import { MEMPOOL_BASE, GAP_LIMIT, NetworkType } from './config';
 
 const bip32 = BIP32Factory(ecc);
-
-const MEMPOOL_BASE = {
-  testnet: 'https://mempool.space/testnet/api',
-  mainnet: 'https://mempool.space/api',
-};
-
-const GAP_LIMIT = 20;
 
 export function validateXpub(xpub: string, network: bitcoin.Network): boolean {
   try {
@@ -80,7 +74,7 @@ async function fetchAddressBalance(
 
 export async function fetchBalance(
   addresses: string[],
-  networkType: 'testnet' | 'mainnet'
+  networkType: NetworkType
 ): Promise<BalanceResult> {
   const baseUrl = MEMPOOL_BASE[networkType];
   let totalConfirmed = 0;
