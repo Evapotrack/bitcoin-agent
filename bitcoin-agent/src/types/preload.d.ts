@@ -2,6 +2,7 @@ import type {
   UTXODisplay,
   FeeEstimates,
   BuildPsbtResult,
+  AgentResponse,
 } from './bitcoin';
 
 interface BitcoinAgentAPI {
@@ -13,6 +14,11 @@ interface BitcoinAgentAPI {
     currentPassword: string,
     newPassword: string
   ) => Promise<{ success: boolean; error?: string }>;
+
+  // Agent
+  hasApiKey: () => Promise<boolean>;
+  setApiKey: (key: string) => Promise<{ success: boolean }>;
+  sendAgentMessage: (message: string) => Promise<AgentResponse>;
 
   // M1 — Wallet
   importXpub: (xpub: string) => Promise<{ success: boolean; error?: string }>;

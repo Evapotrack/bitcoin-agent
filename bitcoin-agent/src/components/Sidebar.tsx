@@ -9,6 +9,7 @@ export function Sidebar() {
 
   const navItems = [
     { id: 'dashboard' as const, label: 'Dashboard', icon: '~' },
+    { id: 'chat' as const, label: 'Agent', icon: '@' },
     { id: 'transactions' as const, label: 'Transactions', icon: '>' },
     { id: 'reference' as const, label: 'Reference', icon: '?' },
     { id: 'howto' as const, label: 'How To', icon: 'i' },

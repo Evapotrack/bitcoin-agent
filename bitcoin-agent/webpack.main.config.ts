@@ -20,5 +20,6 @@ export const mainConfig: Configuration = {
   externals: {
     'tiny-secp256k1': 'commonjs tiny-secp256k1',
     'keytar': 'commonjs keytar',
+    '@anthropic-ai/sdk': 'commonjs @anthropic-ai/sdk',
   },
 };

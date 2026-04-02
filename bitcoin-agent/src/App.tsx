@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useWalletStore } from './store/walletStore';
 import { LockScreen } from './components/LockScreen';
+import { ApiKeySetup } from './components/ApiKeySetup';
 import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './components/Dashboard';
 import { ImportXpubModal } from './components/ImportXpubModal';
@@ -8,11 +9,13 @@ import { ReferenceView } from './components/ReferenceView';
 import { HowToView } from './components/HowToView';
 import { SendView } from './components/SendView';
 import { TransactionsView } from './components/TransactionsView';
+import { ChatView } from './components/ChatView';
 
 export function App() {
   const { xpub, currentView, loadExistingWallet } = useWalletStore();
   const [isLocked, setIsLocked] = useState(true);
   const [hasExistingPassword, setHasExistingPassword] = useState<boolean | null>(null);
+  const [needsApiKey, setNeedsApiKey] = useState<boolean | null>(null);
 
   useEffect(() => {
     window.bitcoinAgent.hasPassword().then(setHasExistingPassword);
@@ -20,10 +23,21 @@ export function App() {
 
   const handleUnlock = () => {
     setIsLocked(false);
+    // Check API key after unlock
+    window.bitcoinAgent.hasApiKey().then((has) => {
+      setNeedsApiKey(!has);
+      if (has) {
+        loadExistingWallet();
+      }
+    });
+  };
+
+  const handleApiKeyComplete = () => {
+    setNeedsApiKey(false);
     loadExistingWallet();
   };
 
-  // Loading — checking if password exists
+  // Loading
   if (hasExistingPassword === null) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-950">
@@ -42,6 +56,11 @@ export function App() {
     );
   }
 
+  // API key setup
+  if (needsApiKey) {
+    return <ApiKeySetup onComplete={handleApiKeyComplete} />;
+  }
+
   // No wallet imported yet
   if (!xpub) {
     return <ImportXpubModal />;
@@ -53,6 +72,8 @@ export function App() {
         return <SendView />;
       case 'transactions':
         return <TransactionsView />;
+      case 'chat':
+        return <ChatView />;
       case 'reference':
         return <ReferenceView />;
       case 'howto':

@@ -48,6 +48,7 @@
     "typescript": "~5.5"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.82.0",
     "axios": "^1.14.0",
     "bip32": "^5.0.1",
     "bitcoinjs-lib": "^7.0.1",

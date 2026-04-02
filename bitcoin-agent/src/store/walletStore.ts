@@ -5,9 +5,10 @@ import type {
   BuildPsbtResult,
   PsbtRecord,
   PsbtStatus,
+  ChatMessage,
 } from '../types/bitcoin';
 
-type View = 'dashboard' | 'send' | 'transactions' | 'reference' | 'howto';
+type View = 'dashboard' | 'send' | 'transactions' | 'chat' | 'reference' | 'howto';
 
 interface WalletState {
   // M1
@@ -26,12 +27,20 @@ interface WalletState {
   signedTxHex: string | null;
   psbtHistory: PsbtRecord[];
 
+  // M3
+  chatHistory: ChatMessage[];
+  isAgentThinking: boolean;
+
   // M1 Actions
   importXpub: (xpub: string) => Promise<void>;
   loadExistingWallet: () => Promise<void>;
   refreshBalance: () => Promise<void>;
   setView: (view: View) => void;
   clearWallet: () => void;
+
+  // M3 Actions
+  sendAgentMessage: (message: string) => Promise<void>;
+  clearChat: () => void;
 
   // M2 Actions
   fetchUtxos: () => Promise<void>;
@@ -65,6 +74,10 @@ export const useWalletStore = create<WalletState>((set, get) => ({
   currentPsbt: null,
   signedTxHex: null,
   psbtHistory: [],
+
+  // M3 State
+  chatHistory: [],
+  isAgentThinking: false,
 
   // M1 Actions
   importXpub: async (xpub: string) => {
@@ -117,6 +130,48 @@ export const useWalletStore = create<WalletState>((set, get) => ({
       balanceUnconfirmed: 0,
       error: null,
     }),
+
+  // M3 Actions
+  sendAgentMessage: async (message: string) => {
+    const userMsg: ChatMessage = {
+      role: 'user',
+      content: message,
+      timestamp: Date.now(),
+    };
+    set((state) => ({
+      chatHistory: [...state.chatHistory, userMsg],
+      isAgentThinking: true,
+      error: null,
+    }));
+    try {
+      const response = await window.bitcoinAgent.sendAgentMessage(message);
+      const assistantMsg: ChatMessage = {
+        role: 'assistant',
+        content: response.message,
+        timestamp: Date.now(),
+        toolResults: response.toolResults.map((tr) => ({
+          tool: tr.tool,
+          result: tr.result,
+        })),
+      };
+      set((state) => ({
+        chatHistory: [...state.chatHistory, assistantMsg],
+        isAgentThinking: false,
+      }));
+    } catch (err) {
+      const errorMsg: ChatMessage = {
+        role: 'assistant',
+        content: `Error: ${(err as Error).message}`,
+        timestamp: Date.now(),
+      };
+      set((state) => ({
+        chatHistory: [...state.chatHistory, errorMsg],
+        isAgentThinking: false,
+      }));
+    }
+  },
+
+  clearChat: () => set({ chatHistory: [] }),
 
   // M2 Actions
   fetchUtxos: async () => {

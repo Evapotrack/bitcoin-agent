@@ -21,7 +21,12 @@ import {
   verifyPassword,
   setPassword,
   changePassword,
+  hasApiKey,
+  getApiKey,
+  storeApiKey,
 } from './keychain';
+import { sendAgentMessage } from './agent/agent';
+import type { MessageParam } from '@anthropic-ai/sdk/resources/messages';
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -185,6 +190,43 @@ ipcMain.handle(
     }
   }
 );
+
+// --- Agent IPC Handlers ---
+
+// In-memory chat history for the agent session
+let agentChatHistory: MessageParam[] = [];
+
+ipcMain.handle('agent:hasApiKey', async () => {
+  return hasApiKey();
+});
+
+ipcMain.handle('agent:setApiKey', async (_event, key: string) => {
+  await storeApiKey(key);
+  return { success: true };
+});
+
+ipcMain.handle('agent:sendMessage', async (_event, message: string) => {
+  const apiKey = await getApiKey();
+  if (!apiKey) throw new Error('No API key configured');
+
+  const xpub = await getXpub();
+  if (!xpub) throw new Error('No wallet imported');
+
+  const context = { xpub, network: NETWORK, networkType: NETWORK_TYPE };
+
+  const response = await sendAgentMessage(
+    apiKey,
+    message,
+    agentChatHistory,
+    context
+  );
+
+  // Update chat history for continuity
+  agentChatHistory.push({ role: 'user', content: message });
+  agentChatHistory.push({ role: 'assistant', content: response.message });
+
+  return response;
+});
 
 // --- Password IPC Handlers ---
 

@@ -40,3 +40,19 @@ export async function changePassword(
   await keytar.setPassword(SERVICE, ACCOUNT_PASSWORD, newPassword);
   return true;
 }
+
+// API key management
+const ACCOUNT_API_KEY = 'anthropic-api-key';
+
+export async function hasApiKey(): Promise<boolean> {
+  const key = await keytar.getPassword(SERVICE, ACCOUNT_API_KEY);
+  return key !== null;
+}
+
+export async function getApiKey(): Promise<string | null> {
+  return keytar.getPassword(SERVICE, ACCOUNT_API_KEY);
+}
+
+export async function storeApiKey(key: string): Promise<void> {
+  await keytar.setPassword(SERVICE, ACCOUNT_API_KEY, key);
+}

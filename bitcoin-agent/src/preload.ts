@@ -10,6 +10,12 @@ contextBridge.exposeInMainWorld('bitcoinAgent', {
   changePassword: (currentPassword: string, newPassword: string) =>
     ipcRenderer.invoke('auth:changePassword', currentPassword, newPassword),
 
+  // Agent
+  hasApiKey: () => ipcRenderer.invoke('agent:hasApiKey'),
+  setApiKey: (key: string) => ipcRenderer.invoke('agent:setApiKey', key),
+  sendAgentMessage: (message: string) =>
+    ipcRenderer.invoke('agent:sendMessage', message),
+
   // M1 — Wallet
   importXpub: (xpub: string) =>
     ipcRenderer.invoke('wallet:importXpub', xpub),

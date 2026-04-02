@@ -44,3 +44,16 @@ export interface PsbtRecord {
   txid?: string;
   createdAt: number;
 }
+
+// Agent types
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: number;
+  toolResults?: { tool: string; result: string }[];
+}
+
+export interface AgentResponse {
+  message: string;
+  toolResults: { tool: string; input: Record<string, unknown>; result: string }[];
+}
