@@ -9,8 +9,13 @@ export function ChatView() {
   } = useWalletStore();
 
   const [input, setInput] = useState('');
+  const [hasKey, setHasKey] = useState<boolean | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    window.bitcoinAgent.hasApiKey().then(setHasKey);
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -33,6 +38,26 @@ export function ChatView() {
       handleSend();
     }
   };
+
+  if (hasKey === false) {
+    return (
+      <div className="max-w-2xl">
+        <h2 className="text-2xl font-bold text-white mb-6">Agent</h2>
+        <div className="bg-gray-900 border border-gray-800 rounded-lg p-8 text-center">
+          <p className="text-sm text-gray-400 mb-3">
+            The Agent chat requires an Anthropic API key.
+          </p>
+          <p className="text-xs text-gray-500 mb-4">
+            Go to console.anthropic.com/settings/keys, create a key, then
+            restart the app to enter it on the setup screen.
+          </p>
+          <p className="text-xs text-gray-600">
+            All other features (Dashboard, Send, Transactions) work without it.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full max-w-3xl">

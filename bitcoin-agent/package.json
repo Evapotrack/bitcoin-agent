@@ -1,8 +1,8 @@
 {
   "name": "bitcoin-agent",
-  "productName": "bitcoin-agent",
-  "version": "1.0.0",
-  "description": "My Electron application description",
+  "productName": "BTC Agent App",
+  "version": "0.3.0",
+  "description": "Personal macOS Bitcoin wallet with AI agent — self-custody, PSBT workflow, Claude-powered",
   "main": ".webpack/main",
   "private": true,
   "scripts": {

@@ -37,6 +37,11 @@ export function App() {
     loadExistingWallet();
   };
 
+  const handleApiKeySkip = () => {
+    setNeedsApiKey(false);
+    loadExistingWallet();
+  };
+
   // Loading
   if (hasExistingPassword === null) {
     return (
@@ -58,7 +63,7 @@ export function App() {
 
   // API key setup
   if (needsApiKey) {
-    return <ApiKeySetup onComplete={handleApiKeyComplete} />;
+    return <ApiKeySetup onComplete={handleApiKeyComplete} onSkip={handleApiKeySkip} />;
   }
 
   // No wallet imported yet

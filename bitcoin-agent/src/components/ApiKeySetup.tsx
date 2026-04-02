@@ -2,9 +2,10 @@ import { useState } from 'react';
 
 interface ApiKeySetupProps {
   onComplete: () => void;
+  onSkip: () => void;
 }
 
-export function ApiKeySetup({ onComplete }: ApiKeySetupProps) {
+export function ApiKeySetup({ onComplete, onSkip }: ApiKeySetupProps) {
   const [apiKey, setApiKey] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -83,8 +84,15 @@ export function ApiKeySetup({ onComplete }: ApiKeySetupProps) {
           {isLoading ? 'Saving...' : 'Save & Continue'}
         </button>
 
-        <p className="text-xs text-gray-600 mt-4 text-center">
-          The agent uses Claude (claude-sonnet-4-6) for tool-use conversations
+        <button
+          onClick={onSkip}
+          className="mt-3 w-full px-4 py-2 bg-transparent hover:bg-gray-800 text-gray-500 hover:text-gray-300 rounded text-sm transition-colors"
+        >
+          Skip for now
+        </button>
+
+        <p className="text-xs text-gray-600 mt-3 text-center">
+          The Agent chat tab requires an API key. All other features work without it.
         </p>
       </div>
     </div>
