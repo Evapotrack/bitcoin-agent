@@ -1,4 +1,5 @@
 # Bitcoin Agent — Lightning Routing & Liquidity Earning
+## Phase 2 (M6) — Not yet implemented — Planning reference
 
 ## Overview
 

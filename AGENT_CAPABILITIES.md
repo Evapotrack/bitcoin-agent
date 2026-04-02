@@ -4,6 +4,25 @@
 
 ---
 
+## Implementation Status (April 2026)
+
+This document describes the **complete agent feature set** planned through M10. Not all tools are implemented yet.
+
+**Currently implemented (M1–M3):**
+- 6 wallet tools: `get_balance`, `get_receive_address`, `estimate_fees`, `get_utxos`, `build_send_psbt`, `get_transactions`
+- Chat interface with Claude tool-use (claude-sonnet-4-6)
+
+**Not yet implemented (M4–M10):**
+- UTXO labeling, privacy scoring, coin control suggestions (M4)
+- Hardware wallet integration — Coldcard QR, Jade USB (M5)
+- Lightning node, NWC, auto-sweep (M6)
+- L402 server, Nostr zaps, earning (M7)
+- Autonomous task discovery (M8)
+- Data export — Markdown/JSON/PDF (M9)
+- Tor routing, full privacy hardening (M10)
+
+---
+
 ## Purpose of This Document
 
 This file is a precise reference for what the Bitcoin Agent can and cannot do, how each task must be prompted, and example prompts for every sub-task. It is written so that Claude Code can reference it directly when implementing agent logic, writing system prompts, and building tool schemas.

@@ -97,10 +97,12 @@ export const TOOL_DEFINITIONS: Tool[] = [
   },
 ];
 
-// In-memory address index counter
+// Address index counter — resets when agent context is created
 let nextAddressIndex = 0;
 
-// PSBT history tracked via IPC — agent reports results, renderer store is source of truth
+export function resetAddressIndex(): void {
+  nextAddressIndex = 0;
+}
 
 export async function executeTool(
   toolName: string,
@@ -217,7 +219,7 @@ export async function executeTool(
 
     default:
       return JSON.stringify({
-        error: `Unknown tool: ${toolName}. Available tools: get_balance, get_receive_address, estimate_fees, get_utxos, build_send_psbt, get_transactions.`,
+        error: `Unknown tool: ${toolName}. Available tools: ${TOOL_DEFINITIONS.map((t) => t.name).join(', ')}.`,
       });
   }
 }

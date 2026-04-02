@@ -167,13 +167,17 @@ ipcMain.handle('wallet:importSignedPsbt', async () => {
   if (result.canceled || result.filePaths.length === 0) {
     return { success: false, error: 'No file selected' };
   }
-  const buffer = fs.readFileSync(result.filePaths[0]);
-  const psbtBase64 = buffer.toString('base64');
-  const validation = validateSignedPsbt(psbtBase64, NETWORK);
-  if (!validation.valid) {
-    return { success: false, error: validation.error };
+  try {
+    const buffer = fs.readFileSync(result.filePaths[0]);
+    const psbtBase64 = buffer.toString('base64');
+    const validation = validateSignedPsbt(psbtBase64, NETWORK);
+    if (!validation.valid) {
+      return { success: false, error: validation.error };
+    }
+    return { success: true, txHex: validation.txHex };
+  } catch (err) {
+    return { success: false, error: `Failed to read file: ${(err as Error).message}` };
   }
-  return { success: true, txHex: validation.txHex };
 });
 
 ipcMain.handle(

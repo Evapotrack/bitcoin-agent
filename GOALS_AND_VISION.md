@@ -286,13 +286,14 @@ Task platforms scanned: Stacker News, Bitbounty.dev, Nostr bounties (NIP-99), LN
 | Apr 1, 2026 | Transaction verification status display spec defined | Done |
 | Apr 1, 2026 | Auto address generation + privacy model defined | Done |
 | Apr 1, 2026 | UTXO consolidation spec (privacy-aware, fee-timed) defined | Done |
-| Apr 1, 2026 | Claude Code prompts written (M1–M10, ordered + detailed) | Done |
 | Apr 1, 2026 | Agent capabilities + limitations reference doc created | Done |
 | Apr 1, 2026 | Project metadata doc created (creator, tools, open source plan) | Done |
 | Apr 1, 2026 | All docs updated with creator info and dev environment | Done |
-| — | M1: Electron shell + xpub import + balance display | Not started |
-| — | M2: PSBT builder + QR export + cold signing workflow | Not started |
-| — | M3: Claude agent with wallet tool-use + persistent memory | Not started |
+| Apr 1, 2026 | M1: Electron shell + xpub import + balance display | Done |
+| Apr 1, 2026 | M2: PSBT builder + QR export + cold signing workflow + password lock | Done |
+| Apr 1, 2026 | M3: Claude agent with wallet tool-use + chat interface | Done |
+| Apr 1, 2026 | API credits documentation + cost/break-even analysis | Done |
+| Apr 1, 2026 | Full project audit + security fixes | Done |
 | — | M4: Full UI + UTXO labeling + coin control | Not started |
 | — | M5: Hardware wallet integration (Coldcard QR, Jade USB) | Not started |
 | — | M6: Lightning node (LDK) + NWC + auto-sweep | Not started |

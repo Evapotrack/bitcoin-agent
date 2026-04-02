@@ -32,7 +32,7 @@ nvm use 20
 ## Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/Evapotrack/bitcoin-agent.git
+git clone https://github.com/[your-github-username]/bitcoin-agent.git
 cd bitcoin-agent/bitcoin-agent
 ```
 
@@ -178,12 +178,16 @@ Ensure you're using Node.js 20+ (`node --version`). Older versions may not suppo
 
 ## What's Next
 
-The app currently supports M1 (wallet import + balance display). Future milestones add:
+The app currently supports M1–M3:
 
-- **M2**: PSBT builder + QR export for cold signing on Coldcard/Jade
-- **M3**: Claude AI agent with wallet tool-use (chat interface)
+- **M1** (complete): Wallet import, balance display, address derivation
+- **M2** (complete): PSBT builder, QR export, cold signing workflow, password lock
+- **M3** (complete): Claude AI agent with wallet tool-use chat interface
+
+Future milestones:
+
 - **M4**: Full UI with UTXO labeling and coin control
-- **M5**: Hardware wallet integration
+- **M5**: Hardware wallet integration (Coldcard QR, Jade USB)
 - **M6+**: Lightning, earning sats, autonomous tasks, Tor privacy
 
 See `PROJECT_PLAN.md` for the full roadmap.
