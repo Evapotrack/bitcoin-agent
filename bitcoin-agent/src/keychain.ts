@@ -41,6 +41,47 @@ export async function changePassword(
   return true;
 }
 
+// Recovery key management
+const ACCOUNT_RECOVERY = 'recovery-key';
+
+function generateRecoveryKey(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const segments: string[] = [];
+  for (let s = 0; s < 4; s++) {
+    let segment = '';
+    for (let i = 0; i < 6; i++) {
+      segment += chars[Math.floor(Math.random() * chars.length)];
+    }
+    segments.push(segment);
+  }
+  return segments.join('-');
+}
+
+export async function createRecoveryKey(): Promise<string> {
+  const key = generateRecoveryKey();
+  await keytar.setPassword(SERVICE, ACCOUNT_RECOVERY, key);
+  return key;
+}
+
+export async function getRecoveryKey(): Promise<string | null> {
+  return keytar.getPassword(SERVICE, ACCOUNT_RECOVERY);
+}
+
+export async function verifyRecoveryKey(key: string): Promise<boolean> {
+  const stored = await keytar.getPassword(SERVICE, ACCOUNT_RECOVERY);
+  return stored === key;
+}
+
+export async function resetPasswordWithRecovery(
+  recoveryKey: string,
+  newPassword: string
+): Promise<boolean> {
+  const valid = await verifyRecoveryKey(recoveryKey);
+  if (!valid) return false;
+  await keytar.setPassword(SERVICE, ACCOUNT_PASSWORD, newPassword);
+  return true;
+}
+
 // API key management
 const ACCOUNT_API_KEY = 'anthropic-api-key';
 

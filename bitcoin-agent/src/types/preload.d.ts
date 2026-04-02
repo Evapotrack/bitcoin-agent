@@ -16,6 +16,14 @@ interface BitcoinAgentAPI {
     newPassword: string
   ) => Promise<{ success: boolean; error?: string }>;
 
+  // Recovery
+  createRecoveryKey: () => Promise<string>;
+  getRecoveryKey: (password: string) => Promise<{ success: boolean; recoveryKey?: string; error?: string }>;
+  resetWithRecovery: (
+    recoveryKey: string,
+    newPassword: string
+  ) => Promise<{ success: boolean; error?: string }>;
+
   // Agent
   hasApiKey: () => Promise<boolean>;
   setApiKey: (key: string) => Promise<{ success: boolean }>;

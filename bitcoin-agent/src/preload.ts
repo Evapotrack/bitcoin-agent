@@ -10,6 +10,13 @@ contextBridge.exposeInMainWorld('bitcoinAgent', {
   changePassword: (currentPassword: string, newPassword: string) =>
     ipcRenderer.invoke('auth:changePassword', currentPassword, newPassword),
 
+  // Recovery
+  createRecoveryKey: () => ipcRenderer.invoke('auth:createRecoveryKey'),
+  getRecoveryKey: (password: string) =>
+    ipcRenderer.invoke('auth:getRecoveryKey', password),
+  resetWithRecovery: (recoveryKey: string, newPassword: string) =>
+    ipcRenderer.invoke('auth:resetWithRecovery', recoveryKey, newPassword),
+
   // Agent
   hasApiKey: () => ipcRenderer.invoke('agent:hasApiKey'),
   setApiKey: (key: string) => ipcRenderer.invoke('agent:setApiKey', key),

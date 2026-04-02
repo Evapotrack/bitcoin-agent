@@ -21,6 +21,9 @@ import {
   verifyPassword,
   setPassword,
   changePassword,
+  createRecoveryKey,
+  getRecoveryKey,
+  resetPasswordWithRecovery,
   hasApiKey,
   getApiKey,
   storeApiKey,
@@ -247,6 +250,27 @@ ipcMain.handle(
 ipcMain.handle('wallet:getUtxoLabels', async () => {
   return getUtxoLabels();
 });
+
+// --- Recovery Key IPC Handlers ---
+
+ipcMain.handle('auth:createRecoveryKey', async () => {
+  return createRecoveryKey();
+});
+
+ipcMain.handle('auth:getRecoveryKey', async (_event, password: string) => {
+  const valid = await verifyPassword(password);
+  if (!valid) return { success: false, error: 'Incorrect password' };
+  const key = await getRecoveryKey();
+  return { success: true, recoveryKey: key };
+});
+
+ipcMain.handle(
+  'auth:resetWithRecovery',
+  async (_event, recoveryKey: string, newPassword: string) => {
+    const success = await resetPasswordWithRecovery(recoveryKey, newPassword);
+    return { success, error: success ? undefined : 'Invalid recovery key' };
+  }
+);
 
 // --- Password IPC Handlers ---
 

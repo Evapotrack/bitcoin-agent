@@ -294,7 +294,10 @@ Task platforms scanned: Stacker News, Bitbounty.dev, Nostr bounties (NIP-99), LN
 | Apr 1, 2026 | M3: Claude agent with wallet tool-use + chat interface | Done |
 | Apr 1, 2026 | API credits documentation + cost/break-even analysis | Done |
 | Apr 1, 2026 | Full project audit + security fixes | Done |
-| — | M4: Full UI + UTXO labeling + coin control | Not started |
+| Apr 1, 2026 | M4: Settings, API usage tracking, UTXO labeling, coin control | Done |
+| Apr 1, 2026 | Recovery key system (create, view, password reset) | Done |
+| Apr 1, 2026 | Packaged as macOS .app (double-click launch) | Done |
+| Apr 1, 2026 | API key purchased and stored in Keychain | Done |
 | — | M5: Hardware wallet integration (Coldcard QR, Jade USB) | Not started |
 | — | M6: Lightning node (LDK) + NWC + auto-sweep | Not started |
 | — | M7: L402 server + Nostr zaps | Not started |

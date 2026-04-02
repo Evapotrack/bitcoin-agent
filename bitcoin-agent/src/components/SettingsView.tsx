@@ -28,6 +28,11 @@ export function SettingsView() {
   const [pwMessage, setPwMessage] = useState<string | null>(null);
   const [pwError, setPwError] = useState(false);
 
+  // Recovery key
+  const [recoveryPw, setRecoveryPw] = useState('');
+  const [recoveryKey, setRecoveryKey] = useState<string | null>(null);
+  const [recoveryError, setRecoveryError] = useState<string | null>(null);
+
   // API key
   const [hasKey, setHasKey] = useState<boolean | null>(null);
   const [newApiKey, setNewApiKey] = useState('');
@@ -134,6 +139,63 @@ export function SettingsView() {
         >
           Change Password
         </button>
+      </div>
+
+      {/* Recovery Key */}
+      <div className="bg-gray-900 border border-gray-800 rounded-lg p-5">
+        <h3 className="text-sm font-semibold text-white mb-1">
+          Recovery Key
+        </h3>
+        <p className="text-xs text-gray-500 mb-3">
+          Your recovery key can reset your password if you forget it. Enter
+          your current password to view it. Store it somewhere safe and private.
+        </p>
+        {recoveryKey ? (
+          <div>
+            <div className="bg-gray-800 rounded-lg p-4 text-center mb-3">
+              <p className="text-lg font-mono text-orange-400 tracking-wider select-all">
+                {recoveryKey}
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                setRecoveryKey(null);
+                setRecoveryPw('');
+              }}
+              className="text-xs text-gray-500 hover:text-gray-400"
+            >
+              Hide recovery key
+            </button>
+          </div>
+        ) : (
+          <div>
+            <input
+              type="password"
+              value={recoveryPw}
+              onChange={(e) => setRecoveryPw(e.target.value)}
+              placeholder="Enter current password to reveal"
+              className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-gray-500"
+            />
+            {recoveryError && (
+              <p className="text-xs text-red-400 mt-2">{recoveryError}</p>
+            )}
+            <button
+              onClick={async () => {
+                setRecoveryError(null);
+                const result = await window.bitcoinAgent.getRecoveryKey(recoveryPw);
+                if (result.success && result.recoveryKey) {
+                  setRecoveryKey(result.recoveryKey);
+                } else {
+                  setRecoveryError(result.error || 'Failed to retrieve recovery key');
+                }
+              }}
+              disabled={!recoveryPw}
+              className="mt-3 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Show Recovery Key
+            </button>
+          </div>
+        )}
       </div>
 
       {/* API Key */}
