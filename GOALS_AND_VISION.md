@@ -298,7 +298,7 @@ Task platforms scanned: Stacker News, Bitbounty.dev, Nostr bounties (NIP-99), LN
 | Apr 1, 2026 | Recovery key system (create, view, password reset) | Done |
 | Apr 1, 2026 | Packaged as macOS .app (double-click launch) | Done |
 | Apr 1, 2026 | API key purchased and stored in Keychain | Done |
-| — | M5: Hardware wallet integration (Coldcard QR, Jade USB) | Not started |
+| Apr 1, 2026 | M5: Blockstream Jade USB signing integration | Done |
 | — | M6: Lightning node (LDK) + NWC + auto-sweep | Not started |
 | — | M7: L402 server + Nostr zaps | Not started |
 | — | M8: Autonomous task discovery + execution | Not started |

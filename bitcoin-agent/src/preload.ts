@@ -23,6 +23,11 @@ contextBridge.exposeInMainWorld('bitcoinAgent', {
   sendAgentMessage: (message: string) =>
     ipcRenderer.invoke('agent:sendMessage', message),
 
+  // Jade USB
+  listJadeDevices: () => ipcRenderer.invoke('wallet:listJadeDevices'),
+  signWithJade: (psbtBase64: string, devicePath?: string) =>
+    ipcRenderer.invoke('wallet:signWithJade', psbtBase64, devicePath),
+
   // UTXO Labels
   labelUtxo: (txid: string, vout: number, label: string) =>
     ipcRenderer.invoke('wallet:labelUtxo', txid, vout, label),

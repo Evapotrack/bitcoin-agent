@@ -29,6 +29,10 @@ interface BitcoinAgentAPI {
   setApiKey: (key: string) => Promise<{ success: boolean }>;
   sendAgentMessage: (message: string) => Promise<AgentResponse>;
 
+  // Jade USB
+  listJadeDevices: () => Promise<{ path: string; manufacturer?: string }[]>;
+  signWithJade: (psbtBase64: string, devicePath?: string) => Promise<{ success: boolean; txHex?: string; error?: string }>;
+
   // UTXO Labels
   labelUtxo: (txid: string, vout: number, label: string) => Promise<void>;
   getUtxoLabels: () => Promise<Record<string, string>>;

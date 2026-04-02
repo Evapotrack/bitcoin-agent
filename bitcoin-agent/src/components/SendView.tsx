@@ -38,6 +38,8 @@ export function SendView() {
   const [feePreset, setFeePreset] = useState<'fast' | 'normal' | 'economy' | 'custom'>('normal');
   const [customFeeRate, setCustomFeeRate] = useState('');
   const [broadcastTxid, setBroadcastTxid] = useState<string | null>(null);
+  const [jadeStatus, setJadeStatus] = useState<'idle' | 'signing' | 'error'>('idle');
+  const [jadeError, setJadeError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchFees();
@@ -90,6 +92,32 @@ export function SendView() {
     if (latest?.txid) {
       setBroadcastTxid(latest.txid);
       setStep('done');
+    }
+  };
+
+  const handleSignWithJade = async () => {
+    if (!currentPsbt) return;
+    setJadeStatus('signing');
+    setJadeError(null);
+    try {
+      const result = await window.bitcoinAgent.signWithJade(currentPsbt.psbtBase64);
+      if (!result.success) {
+        setJadeStatus('error');
+        setJadeError(result.error || 'Jade signing failed');
+        return;
+      }
+      // Store the signed tx and advance to broadcast
+      useWalletStore.setState({
+        signedTxHex: result.txHex || null,
+        psbtHistory: useWalletStore.getState().psbtHistory.map((r, i) =>
+          i === 0 && r.status === 'built' ? { ...r, status: 'signed' as const } : r
+        ),
+      });
+      setJadeStatus('idle');
+      setStep('broadcast');
+    } catch (err) {
+      setJadeStatus('error');
+      setJadeError((err as Error).message);
     }
   };
 
@@ -382,7 +410,32 @@ export function SendView() {
           </div>
         )}
 
+        {/* Jade signing status */}
+        {jadeStatus === 'signing' && (
+          <div className="bg-orange-900/20 border border-orange-800 rounded p-4 mb-4 text-center">
+            <p className="text-sm text-orange-400 animate-pulse mb-1">
+              Waiting for confirmation on Jade...
+            </p>
+            <p className="text-xs text-gray-500">
+              Review and approve the transaction on your Jade device.
+            </p>
+          </div>
+        )}
+
+        {jadeError && (
+          <div className="bg-red-900/20 border border-red-800 rounded p-3 mb-4">
+            <p className="text-sm text-red-400">{jadeError}</p>
+          </div>
+        )}
+
         <div className="flex flex-col gap-2">
+          <button
+            onClick={handleSignWithJade}
+            disabled={jadeStatus === 'signing'}
+            className="w-full px-4 py-2.5 bg-orange-600 hover:bg-orange-500 text-white rounded text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {jadeStatus === 'signing' ? 'Waiting for Jade...' : 'Sign with Jade USB'}
+          </button>
           <button
             onClick={handleExportFile}
             className="w-full px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded text-sm transition-colors"

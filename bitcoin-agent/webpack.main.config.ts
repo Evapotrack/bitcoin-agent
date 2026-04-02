@@ -21,5 +21,7 @@ export const mainConfig: Configuration = {
     'tiny-secp256k1': 'commonjs tiny-secp256k1',
     'keytar': 'commonjs keytar',
     '@anthropic-ai/sdk': 'commonjs @anthropic-ai/sdk',
+    'serialport': 'commonjs serialport',
+    'cbor-x': 'commonjs cbor-x',
   },
 };

@@ -30,6 +30,7 @@ import {
 } from './keychain';
 import { sendAgentMessage } from './agent/agent';
 import { getUtxoLabels } from './agent/tools';
+import { listJadeDevices, signPsbtWithJade } from './bitcoin/jade';
 import type { MessageParam } from '@anthropic-ai/sdk/resources/messages';
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
@@ -235,6 +236,42 @@ ipcMain.handle('agent:sendMessage', async (_event, message: string) => {
 
   return response;
 });
+
+// --- Jade USB IPC Handlers ---
+
+ipcMain.handle('wallet:listJadeDevices', async () => {
+  try {
+    return await listJadeDevices();
+  } catch (err) {
+    return [];
+  }
+});
+
+ipcMain.handle(
+  'wallet:signWithJade',
+  async (_event, psbtBase64: string, devicePath?: string) => {
+    try {
+      // If no path specified, find the first Jade device
+      let path = devicePath;
+      if (!path) {
+        const devices = await listJadeDevices();
+        if (devices.length === 0) {
+          return { success: false, error: 'No Jade device found. Connect via USB and try again.' };
+        }
+        path = devices[0].path;
+      }
+      const signedPsbt = await signPsbtWithJade(path, psbtBase64, NETWORK_TYPE);
+      // Validate the signed PSBT
+      const validation = validateSignedPsbt(signedPsbt, NETWORK);
+      if (!validation.valid) {
+        return { success: false, error: validation.error };
+      }
+      return { success: true, txHex: validation.txHex };
+    } catch (err) {
+      return { success: false, error: (err as Error).message };
+    }
+  }
+);
 
 // --- UTXO Label IPC Handlers ---
 
